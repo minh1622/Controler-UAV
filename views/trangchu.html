@@ -1,0 +1,200 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Realtime GPS Tracker</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="socket.io/socket.io.js"></script>
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    #layOut {
+      display: flex;
+      flex-direction: row;
+      height: 100%;
+    }
+
+    .item-1 {
+      width: 670px;
+      border-right:1px solid black ;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .video-tracking {
+      border-bottom: 1px solid black;
+      background-color: rgb(30, 86, 128);
+      padding: 0 0 10px 24px;
+    }
+    .video-tracking p {
+      font-size: 28px;
+      color: white;
+      text-align: center;
+      padding-top: 10px;
+    }
+    .video {
+      background-color: white;
+      height: 270px;
+      width: 400px;
+      text-align: center;
+      border: 1px solid black;
+      padding-top: 10px;
+      overflow: scroll;
+    }
+
+    .pos {
+      height: auto;
+      padding-top: 7px;
+    }
+
+    .pos-1 {
+      text-align: center;
+      font-size: 28px;
+      background-color: rgb(30, 86, 128);
+      color: white;
+    }
+    .pos-2 {
+      margin-left:30px;
+    }
+    .pos-2 span:nth-child(1){
+      font-size: 17px;
+      font-weight: 500;
+    }
+
+    .pos-2 span:nth-child(2) {
+      color: red;
+      float: right;
+      margin-right: 25px;
+    }
+    hr {
+      border: 0.5px solid LightGray;
+    }
+    .item-2 {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .info {
+      height: 130px;
+      border-bottom: 1px solid black;
+      text-align: center;
+      line-height: 130px;
+      font-size: 28px;
+      background-color: rgb(30, 86, 128);
+      color: white;
+    }
+    .map {
+      height: 100%;
+      width: 100%;
+    }
+
+    .pos-3 {
+      margin-left: 20px;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .pos-3 input {
+      float: right;
+      margin-right: 30px;
+    }
+  </style>
+  <body>
+    <div id="layOut">
+      <div class="item item-1 left">
+        <div class="video-tracking">
+          <p>Video tracking from drone</p>
+          <div class="video">
+            <iframe width="320" height="240" src="https://www.youtube.com/embed/19C9rsJquRw" 
+            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <iframe width="320" height="240" src="https://www.youtube.com/embed/19C9rsJquRw" 
+            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="pos">
+          <p class="pos-1">Coordinate of drone</p>
+          <p class="pos-2">
+            <span>Latitude:</span>
+            <span id="lat">20.0000</span>
+          </p>
+          <p class="pos-2">
+            <span>Longitude:</span>
+            <span id="lng">20.0000</span>
+          </p>
+          <hr/>
+          <form class="pos-3" action="/" method="POST">
+            <label for="lat">Latitude</label>
+            <input type="number" name="lat"> <br/>
+            <label for="lng">Longitude</label>
+            <input type="number" name="lng">
+            <br/>
+            <input type="submit" value="Submit">
+          </form>
+        </div>
+      </div>
+      <div class="item item-2 right">
+        <div class="info">
+          <p>Embedded Networking Laboratory C9-411</p>
+        </div>
+        <div id="map-canvas" class="map"></div>
+      </div>
+    </div>
+
+
+
+    <!-- scripting -->
+    <script>
+      // socketIO
+      const socketIO = io("/")
+      // Location
+      window.lat = 21.005839;
+      window.lng = 105.8421251;
+      var map;
+      var mark;
+      var lineCoords = [];
+      
+      // New map
+      var initialize = function() {
+        map  = new google.maps.Map(document.getElementById('map-canvas'), {center:{lat:lat,lng:lng},zoom:18});
+        mark = new google.maps.Marker({position:{lat:lat, lng:lng}, map:map});
+      };
+      window.initialize = initialize;
+
+      // Draw map
+      var redraw = function(payload) {
+        if(payload != null){
+        lat = payload.lat;
+        lng = payload.lng;
+        map.setCenter({lat:lat, lng:lng, alt:0});
+        mark.setPosition({lat:lat, lng:lng, alt:0});
+        lineCoords.push(new google.maps.LatLng(lat, lng));
+        var lineCoordinatesPath = new google.maps.Polyline({
+          path: lineCoords,
+          geodesic: true,
+          strokeColor: '#2E10FF'
+        });
+        lineCoordinatesPath.setMap(map);}
+      };
+
+      function setGPS(gps){
+        document.getElementById("lat").innerHTML = gps.lat;
+        document.getElementById("lng").innerHTML = gps.lng;
+      }
+      // Update realtime GPS
+      socketIO.on("send-gps", (gps)=>{
+        redraw(gps)
+        setGPS(gps)
+      })
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDhAMMXFpoAmcYeyKsVJvdD1JjXTPTjAM8&callback=initialize"></script>
+  </body>
+</html>
