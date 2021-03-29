@@ -2,8 +2,6 @@ var express = require("express");
 var app = express();
 var cons = require("consolidate");
 var fs = require("fs");
-const { parse } = require("path");
-const { bracket } = require("consolidate");
 app.engine('html', cons.swig)
 app.use(express.static("./public"));
 app.set("view engine", "html");
@@ -33,6 +31,11 @@ function sendGps(socket)
     var GPS = {lat: parseFloat(parseString.Lat[0].value), lng: parseFloat(parseString.Lng[0].value)}
     socket.emit("send-gps", GPS)
 }
+
 app.get("/", function(req,res){
     res.render("trangchu");
+})
+
+app.get("/login", function(req,res){
+    res.render("login");
 })

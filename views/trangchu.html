@@ -5,8 +5,10 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src="socket.io/socket.io.js"></script>
+    <script src="https://kit.fontawesome.com/fb45b9aef4.js" crossorigin="anonymous"></script>
   </head>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
     * {
       margin: 0;
       padding: 0;
@@ -14,80 +16,24 @@
 
     html, body {
       height: 100%;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: 'Poppins', sans-serif;
     }
     #layOut {
       display: flex;
       flex-direction: row;
       height: 100%;
     }
-
-    .item-1 {
-      width: 670px;
-      border-right:1px solid black ;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .video-tracking {
-      border-bottom: 1px solid black;
-      background-color: rgb(30, 86, 128);
-      padding: 0 0 10px 24px;
-    }
-    .video-tracking p {
-      font-size: 28px;
-      color: white;
-      text-align: center;
-      padding-top: 10px;
-    }
-    .video {
-      background-color: white;
-      height: 270px;
-      width: 400px;
-      text-align: center;
-      border: 1px solid black;
-      padding-top: 10px;
-      overflow: scroll;
-    }
-
-    .pos {
-      height: auto;
-      padding-top: 7px;
-    }
-
-    .pos-1 {
-      text-align: center;
-      font-size: 28px;
-      background-color: rgb(30, 86, 128);
-      color: white;
-    }
-    .pos-2 {
-      margin-left:30px;
-    }
-    .pos-2 span:nth-child(1){
-      font-size: 17px;
-      font-weight: 500;
-    }
-
-    .pos-2 span:nth-child(2) {
-      color: red;
-      float: right;
-      margin-right: 25px;
-    }
-    hr {
-      border: 0.5px solid LightGray;
-    }
-    .item-2 {
+    .content {
       width: 100%;
       display: flex;
       flex-direction: column;
     }
 
     .info {
-      height: 130px;
-      border-bottom: 1px solid black;
+      height: 70px;
+      border-bottom: 1px solid gray;
       text-align: center;
-      line-height: 130px;
+      line-height: 70px;
       font-size: 28px;
       background-color: rgb(30, 86, 128);
       color: white;
@@ -96,62 +42,222 @@
       height: 100%;
       width: 100%;
     }
-
-    .pos-3 {
-      margin-left: 20px;
-      font-size: 15px;
-      font-weight: 500;
+    ::-webkit-scrollbar { 
+      display: none; 
     }
-
-    .pos-3 input {
-      float: right;
-      margin-right: 30px;
-    }
+     /* Design Navbar */
+     .navbar-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 65px;
+      height: 100%;
+      padding: 10px 10px 30px 20px;
+      background-color: #ffffff;
+      box-shadow: 1px 0 0 rgba(22, 8, 43, .1);
+      transition: width 200ms ease;
+      z-index: 100;
+     }
+     .nav__container {
+       height: 100%;
+       display: flex;
+       flex-direction: column;
+       justify-content: space-between;
+       overflow: auto;
+       scrollbar-width: none;
+     }
+     .nav__logo {
+       font-weight: 600;
+       margin-bottom: 15px;
+     }
+     .nav_list {
+       display: grid;
+       row-gap: 30px;
+     }
+     .nav_items {
+       display: grid;
+       row-gap: 17px;
+     }
+     .nav_subtitle {
+       font-size: 20px;
+       text-transform: uppercase;
+       letter-spacing: 5px;
+       color: #58555E;
+     }
+     .nav__link {
+       color: #58555E;
+       display: flex;
+       align-items: center;
+     }
+     .nav__link:hover {
+       color: #6923D0;
+       text-decoration: none;
+     }
+     .nav__name {
+       font-weight: 400;
+       white-space: nowrap;
+     }
+     .nav__icon {
+       font-size: 20px;
+       margin-right: 10px;
+     }
+     .active {
+       color: #6923d0;
+     }
+     /* Dropdown collaps */
+     .nav__dropdown {
+       overflow: hidden;
+       transition: .4s ease-in-out;
+       max-height: 21px;
+     }
+     .nav__dropdown-icon {
+       margin-left: auto;
+       transition: .4s;
+     }
+     .nav__dropdown-collapse {
+       border-radius: 3px;
+       margin-top: 10px;
+       background-color: #b4b4b4;
+     }
+     .nap__dropdown-content {
+       display: grid;
+       row-gap: 7px;
+       padding: 15px 10px 10px 20px;
+     }
+     .nav__dropdown:hover .nav__dropdown-icon {
+       transform: rotate(180deg);
+     }
+     /* Drone POSITION */
+     .drone-pos {
+       position: absolute;
+       z-index: 1;
+       margin: 240px 80px 0 900px;
+       height: 125px;
+       width: 200px;
+       background-color: #3c3c3c;
+       display: flex;
+       flex-direction: column;
+       color: white;
+     }
+     .drone-pos p{
+       margin-bottom: 0px;
+     }
+     .pos-1{
+       background-color: #b4b4b4;
+       text-align: center;
+       color: #003f57;
+     }
+     .drone-pos p{
+       text-align: center;
+     }
+     /* Dropdown show */
+     .nav__dropdown:hover {
+      max-height: 160px;
+     }
+     .nav-hiden {
+       opacity: 0;
+     }
+     .navbar-nav:hover {
+      width: 230px;
+     }
+     .navbar-nav:hover .nav-hiden{
+      opacity: 1;
+     }
+     /* Responsive */
+     @media only screen and (min-width: 370px) and (max-width: 1024px)
+     {
+       .drone-pos {
+         margin: 250px 0 0 600px;
+       }
+     }
   </style>
+  
+  <!-- Main HTML -->
   <body>
     <div id="layOut">
-      <div class="item item-1 left">
-        <div class="video-tracking">
-          <p>Video tracking from drone</p>
-          <div class="video">
-            <iframe width="320" height="240" src="https://www.youtube.com/embed/19C9rsJquRw" 
-            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            <iframe width="320" height="240" src="https://www.youtube.com/embed/19C9rsJquRw" 
-            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <!-- Navbar -->
+      <div class="navbar-nav" id="navbar">
+        <nav class="nav__container">
+          <!-- Nav1 -->
+          <div class="nav_list">
+             <!-- Logo -->
+            <a href="#" class="nav__link nav__logo">
+              <i class="fas fa-cogs nav__icon"></i>
+              <span class="nav-hiden">UAV Control</span>
+            </a>
+            <div class="nav_items">
+              <h4 class="nav_subtitle nav-hiden">Control</h4>
+
+              <a href="#" class="nav__link">
+                <i class="fas fa-map-marker-alt nav__icon"></i>
+                <span class="nav__name nav-hiden">Drone Checking Pos</span>
+              </a>
+              <a href="#" class="nav__link">
+                <i class="fas fa-paper-plane nav__icon"></i>
+                <span class="nav__name nav-hiden">Fly</span>
+              </a>
+              <!-- dropdown -->
+              <div class="nav__dropdown">
+                <a href="#" class="nav__link">
+                  <i class="fas fa-photo-video nav__icon"></i>
+                  <span class="nav__name nav-hiden">Media</span>
+                  <i class="fas fa-chevron-down nav__icon nav__dropdown-icon nav-hiden"></i>
+                </a>
+                <!-- dropdown items -->
+                <div class="nav__dropdown-collapse">
+                  <div class="nap__dropdown-content">
+                    <a href="#" class="nap__dropdown-items nav__link">
+                      <i class="fas fa-film nav__icon"></i>
+                      <span class="nav__name nav-hiden">Video</span>
+                    </a>
+                    <a href="#" class="nap__dropdown-items nav__link">
+                      <i class="fas fa-podcast nav__icon"></i>
+                      <span class="nav__name nav-hiden">Streaming</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Nav2 -->
+            <div class="nav_items">
+              <h4 class="nav_subtitle nav-hiden">Setting</h4>
+
+              <a href="#" class="nav__link">
+                <i class="fas fa-map-marker-alt nav__icon"></i>
+                <span class="nav__name nav-hiden">abc</span>
+              </a>
+            </div>
           </div>
-        </div>
-        <div class="pos">
-          <p class="pos-1">Coordinate of drone</p>
-          <p class="pos-2">
-            <span>Latitude:</span>
-            <span id="lat">20.0000</span>
-          </p>
-          <p class="pos-2">
-            <span>Longitude:</span>
-            <span id="lng">20.0000</span>
-          </p>
-          <hr/>
-          <form class="pos-3" action="/" method="POST">
-            <label for="lat">Latitude</label>
-            <input type="number" name="lat"> <br/>
-            <label for="lng">Longitude</label>
-            <input type="number" name="lng">
-            <br/>
-            <input type="submit" value="Submit">
-          </form>
-        </div>
+
+          <!-- Log out -->
+          <a href="#" class="nav__link">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="nav__name nav-hiden">Log Out</span>
+          </a>
+        </nav>
       </div>
-      <div class="item item-2 right">
+      <!-- Info -->
+      <div class="content right">
         <div class="info">
-          <p>Embedded Networking Laboratory C9-411</p>
+          <span>Embedded Networking Laboratory C9-411</span>
         </div>
         <div id="map-canvas" class="map"></div>
+      </div>
+      <!-- Drone Position -->
+      <div class="drone-pos">
+        <div class="pos-1">Drone Position</div>
+        <div class="pos-2">
+          <p>Latitude</p>
+          <p id="lat">27.0000</p>
+          <p>Longitude</p>
+          <p id="lng">125.0000</p>
+        </div>
       </div>
     </div>
 
 
 
-    <!-- scripting -->
+    <!-- script -->
     <script>
       // socketIO
       const socketIO = io("/")
@@ -194,6 +300,13 @@
         redraw(gps)
         setGPS(gps)
       })
+      // Navbar
+      const linkColor = document.querySelectorAll(".nav__link");
+      function colorLink(){
+        linkColor.forEach(l => l.classList.remove("active"))
+        this.classList.add("active")
+      }
+      linkColor.forEach(l => l.addEventListener("click", colorLink))
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDhAMMXFpoAmcYeyKsVJvdD1JjXTPTjAM8&callback=initialize"></script>
   </body>
