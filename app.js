@@ -1,5 +1,6 @@
-var express = require("express");
-var app = express();
+const express = require("express");
+const app = express();
+const path = require('path')
 var cons = require("consolidate");
 var fs = require("fs");
 app.engine('html', cons.swig)
@@ -10,7 +11,7 @@ app.set("views", "./views");
 var server = require("http").Server(app);
 var io = require("socket.io")(server);
 server.listen(3000,"127.0.0.1");
-
+app.use('/public', express.static(path.join(__dirname, '/public')));
 
 io.on("connection", function(socket){
     console.log("new connection: "+ socket.id)
@@ -36,6 +37,6 @@ app.get("/", function(req,res){
     res.render("trangchu");
 })
 
-app.get("/login", function(req,res){
-    res.render("login");
+app.get("/test", function(req,res){
+    res.render("test");
 })
