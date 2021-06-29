@@ -239,7 +239,7 @@ function showAndUpdateData(num) {
     if (num == 0){
         device1.then(res => {
             $('#key').text(`Humidity`)
-            $('#value').text(`${res.HUM[0][1]}`)
+            $('#value').text(`${res.HUM[0][1]} %`)
         })
         .catch(err => {
             console.log(err)
@@ -248,7 +248,7 @@ function showAndUpdateData(num) {
     if (num == 1){
         device3.then(res => {
             $('#key').text(`Temperature`)
-            $('#value').text(`${res.TEMP4[0][1]}`)
+            $('#value').text(`${res.TEMP4[0][1]} °C`)
         })
         .catch(err => {
             console.log(err)
@@ -257,7 +257,7 @@ function showAndUpdateData(num) {
     if (num == 2) {
         device5.then(res => {
             $('#key').text(`Dust`)
-            $('#value').text(`${res.DUST1[0][1]}`)
+            $('#value').text(`${res.DUST1[0][1]} mg/m3`)
         })
         .catch(err => {
             console.log(err)
