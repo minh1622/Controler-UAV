@@ -1,6 +1,26 @@
-function WebSocketAPIExample() {
-    var token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJlbmwubGFiNDExQGdtYWlsLmNvbSIsInNjb3BlcyI6WyJURU5BTlRfQURNSU4iXSwidXNlcklkIjoiNzlkYjhhZTAtNmEyNy0xMWU4LTk2NjUtMTMyMDYzOTIxYjExIiwiZmlyc3ROYW1lIjoibGFiIiwibGFzdE5hbWUiOiI0MTEiLCJlbmFibGVkIjp0cnVlLCJwcml2YWN5UG9saWN5QWNjZXB0ZWQiOnRydWUsImlzUHVibGljIjpmYWxzZSwidGVuYW50SWQiOiI3OWQ2MGNhMC02YTI3LTExZTgtOTY2NS0xMzIwNjM5MjFiMTEiLCJjdXN0b21lcklkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiaXNzIjoidGhpbmdzYm9hcmQuaW8iLCJpYXQiOjE2MjQzNDk2MzgsImV4cCI6MTYyNjE0OTYzOH0.K4k6RlLvcKrXg-OKv3r6yU4NBGqkNodIJ-U7PAV2J73PbA_6Vn-8gHQhgYEokPY1lA0UZdi5fG1Q3dnYUEjZHg";
-    var entityId = "1ce61eb0-d336-11eb-9381-ab2a1a8daaf0";
+// Location
+window.lat = 21.005839;
+window.lng = 105.8421251;
+var map;
+var mark;
+var lineCoords = [];
+var markers = [];
+//data received frome thingsboard
+var receivedData1;
+var receivedData2;
+var data;
+
+//sensor position
+const sensorGPS = [
+    {lat: 21.00652027333162, lng: 105.84299587028097},
+    {lat: 21.006556714156694, lng: 105.84280637179762},
+    {lat: 21.006687733449493, lng: 105.84300732301932}
+];
+
+//function auto update drone position
+function deviceGPSUAV() {
+    var token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsaW5oLm5uMjgwMzk5QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJURU5BTlRfQURNSU4iXSwidXNlcklkIjoiYmJhYTFlNTAtZDY1My0xMWViLTkzODEtYWIyYTFhOGRhYWYwIiwiZmlyc3ROYW1lIjoiTmd1eWVuIiwibGFzdE5hbWUiOiJOaGF0IExpbmgiLCJlbmFibGVkIjp0cnVlLCJwcml2YWN5UG9saWN5QWNjZXB0ZWQiOnRydWUsImlzUHVibGljIjpmYWxzZSwidGVuYW50SWQiOiJiYTgyOGU0MC1kNjUzLTExZWItOTM4MS1hYjJhMWE4ZGFhZjAiLCJjdXN0b21lcklkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiaXNzIjoidGhpbmdzYm9hcmQuaW8iLCJpYXQiOjE2MjQ4ODI0OTEsImV4cCI6MTYyNjY4MjQ5MX0.U39ncfK0FsmJMfzxZ1pLWvHC9fFbtV9w-iOYlIC7S2HYL9lf1Wsq3YESs80cOI1hp6goZ1vmBcPj-bIxL45wrQ";
+    var entityId = "ab416f70-d8b3-11eb-b87d-c1a34fc0b07b";
     var webSocket = new WebSocket("wss://demo.thingsboard.io/api/ws/plugins/telemetry?token=" + token);
     webSocket.onopen = function () {
         var object = {
@@ -17,37 +37,98 @@ function WebSocketAPIExample() {
         };
         var data = JSON.stringify(object);
         webSocket.send(data);
-        console.log("Message is sent: " + data);
     };
 
     webSocket.onmessage = function (event) {
         var received_msg = event.data;
-        console.log("Message is received: " + received_msg);
+        var receivedData = JSON.parse(received_msg)
+        lat = parseFloat(receivedData.data.Lat_UAV[0][1])
+        lng = parseFloat(receivedData.data.Lon_UAV[0][1])
+        var GPS = {
+            lat: lat,
+            lng: lng
+        }
+        redraw(GPS)
+        setGPS(GPS)
     };
-
     webSocket.onclose = function (event) {
         alert("Connection is closed!");
     };
 }
-setInterval(()=>{
-    WebSocketAPIExample()
-},3000)
+function device2(entityId) {
+    var token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsaW5oLm5uMjgwMzk5QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJURU5BTlRfQURNSU4iXSwidXNlcklkIjoiYmJhYTFlNTAtZDY1My0xMWViLTkzODEtYWIyYTFhOGRhYWYwIiwiZmlyc3ROYW1lIjoiTmd1eWVuIiwibGFzdE5hbWUiOiJOaGF0IExpbmgiLCJlbmFibGVkIjp0cnVlLCJwcml2YWN5UG9saWN5QWNjZXB0ZWQiOnRydWUsImlzUHVibGljIjpmYWxzZSwidGVuYW50SWQiOiJiYTgyOGU0MC1kNjUzLTExZWItOTM4MS1hYjJhMWE4ZGFhZjAiLCJjdXN0b21lcklkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiaXNzIjoidGhpbmdzYm9hcmQuaW8iLCJpYXQiOjE2MjQ4ODI0OTEsImV4cCI6MTYyNjY4MjQ5MX0.U39ncfK0FsmJMfzxZ1pLWvHC9fFbtV9w-iOYlIC7S2HYL9lf1Wsq3YESs80cOI1hp6goZ1vmBcPj-bIxL45wrQ";
+    // var entityId = "cec14fa0-d80a-11eb-b87d-c1a34fc0b07b";
+    var webSocket = new WebSocket("wss://demo.thingsboard.io/api/ws/plugins/telemetry?token=" + token);
+    webSocket.onopen = function () {
+        var object = {
+            tsSubCmds: [
+                {
+                    entityType: "DEVICE",
+                    entityId: entityId,
+                    scope: "LATEST_TELEMETRY",
+                    cmdId: 10
+                }
+            ],
+            historyCmds: [],
+            attrSubCmds: []
+        };
+        var data = JSON.stringify(object);
+        webSocket.send(data);
+    };
 
-// socketIO
-const socketIO = io("/")
-// Location
-window.lat = 21.005839;
-window.lng = 105.8421251;
-var map;
-var mark;
-var lineCoords = [];
-
+    webSocket.onmessage = function (event) {
+        var received_msg = event.data;
+        receivedData = JSON.parse(received_msg)
+    };
+    webSocket.onclose = function (event) {
+        alert("Connection is closed!");
+    };
+    return receivedData
+}
 // New map
 var initialize = function() {
-map  = new google.maps.Map(document.getElementById('map-canvas'), {center:{lat:lat,lng:lng},zoom:18});
-mark = new google.maps.Marker({position:{lat:lat, lng:lng}, map:map});
+    map = new google.maps.Map(document.getElementById('map-canvas'), {
+        center:{lat:lat,lng:lng},
+        zoom:18
+    });
+    mark = new google.maps.Marker({
+        position:{lat:lat, lng:lng}, 
+        map:map,
+        shouldFocus: false
+    });
+    for (let i = 0; i<sensorGPS.length; i++){
+        newSensor(sensorGPS[i], i, 156)
+    }
+
 };
 window.initialize = initialize;
+
+//Set new marker sensor
+function newSensor(position, num, data) {
+    var sensors = new google.maps.Marker({
+        position: position,
+        map,
+    })
+    const contentString = '<div id="content">' +
+    '<div id="siteNotice">' +
+    "</div>" +
+    `<h4 id="firstHeading">Sensor ${num}</h4>` +
+    '<div id="bodyContent">' +
+    `<p>State: ON</p>` +
+    "(last time update 29/6/2021)</p>" +
+    "</div>" +
+    "</div>";
+    const infowindow = new google.maps.InfoWindow({
+        content: contentString,
+    });
+    sensors.addListener("click", () => {
+        infowindow.open({
+            anchor: sensors,
+            map,
+        });
+        showAndUpdateData(num)
+    });
+}
 
 // Draw map
 var redraw = function(payload) {
@@ -65,16 +146,12 @@ var redraw = function(payload) {
     lineCoordinatesPath.setMap(map);}
 };
 
+//set new GPS drone
 function setGPS(gps){
     document.getElementById("lat").innerHTML = gps.lat;
     document.getElementById("lng").innerHTML = gps.lng;
 }
 
-// Update realtime GPS
-socketIO.on("send-gps", (gps)=>{
-    redraw(gps)
-    setGPS(gps)
-})
 // Navbar
 const linkColor = document.querySelectorAll(".nav__link");
 function colorLink(){
@@ -82,3 +159,18 @@ function colorLink(){
     this.classList.add("active")
 }
 linkColor.forEach(l => l.addEventListener("click", colorLink))
+
+function showAndUpdateData(num) {
+    $('.data-sensor .pos-1').text(`Sensor number ${num}`)
+    $('#data1').text(`${data}`)
+    $('.data-sensor').show()
+    console.log(WebSocketAPIExample("ab416f70-d8b3-11eb-b87d-c1a34fc0b07b"))
+}
+// Update UAV position
+setInterval(()=>{
+    deviceGPSUAV();
+}, 2000)
+
+// setInterval(()=>{
+//     console.log(WebSocketAPIExample("ab416f70-d8b3-11eb-b87d-c1a34fc0b07b"))
+// }, 2000)

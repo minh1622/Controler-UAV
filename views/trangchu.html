@@ -4,9 +4,9 @@
     <title>Realtime GPS Tracker</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="socket.io/socket.io.js"></script>
     <script src="https://kit.fontawesome.com/fb45b9aef4.js" crossorigin="anonymous"></script>
     <script src="/public/js/data.js"></script>
+    <script src="/public/js/jquery.js"></script>
     <link rel="stylesheet" href="/public/css/trangchu.css">
   </head>
   
@@ -21,7 +21,7 @@
              <!-- Logo -->
             <a href="#" class="nav__link nav__logo">
               <i class="fas fa-cogs nav__icon"></i>
-              <span class="nav-hiden">UAV Control</span>
+              <span class="nav-hiden" onclick="drop()">UAV Control</span>
             </a>
             <div class="nav_items">
               <h4 class="nav_subtitle nav-hiden">Control</h4>
@@ -89,6 +89,13 @@
           <p id="lat">27.0000</p>
           <p>Longitude</p>
           <p id="lng">125.0000</p>
+        </div>
+      </div>
+      <div class="drone-pos data-sensor" style="margin: 120px 80px 0 150px;">
+        <div class="pos-1">dasd</div>
+        <div class="pos-2">
+          <p>TEMP4</p>
+          <p id="data1"></p>
         </div>
       </div>
     </div>
