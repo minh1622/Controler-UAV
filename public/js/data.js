@@ -207,7 +207,7 @@ var redraw = function(payload) {
     if(payload != null){
         lat = payload.lat;
         lng = payload.lng;
-        map.setCenter({lat:lat, lng:lng, alt:0});
+        // map.setCenter({lat:lat, lng:lng, alt:0});
         mark.setPosition({lat:lat, lng:lng, alt:0});
         lineCoords.push(new google.maps.LatLng(lat, lng));
         var lineCoordinatesPath = new google.maps.Polyline({
@@ -263,8 +263,14 @@ function showAndUpdateData(num) {
             console.log(err)
         })
     }
-    $('.data-sensor').show()
+    if($('.data-sensor').is(':visible')){
+        $('.data-sensor').hide()
+    }
+    else {
+        $('.data-sensor').show()
+    }
 }
+
 // Update UAV position
 setInterval(()=>{
     deviceGPSUAV();

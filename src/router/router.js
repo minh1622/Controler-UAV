@@ -5,8 +5,8 @@ router.get("/", function(req,res){
     res.render("trangchu");
 })
 
-router.get("/test", function(req,res){
-    res.render("test");
+router.get("/stream", function(req,res){
+    res.render("stream");
 })
 
 module.exports = router
