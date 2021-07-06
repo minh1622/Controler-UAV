@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -14,11 +14,13 @@
   "author": "MinhDC2690",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "consolidate": "^0.16.0",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
     "html": "^1.0.0",
     "ls": "^0.2.1",
+    "mqtt": "^4.2.8",
     "socket.io": "^4.0.0",
     "swig": "^1.4.2"
   },

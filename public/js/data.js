@@ -20,7 +20,7 @@ const sensorGPS = [
 //function auto update drone position
 function deviceGPSUAV() {
     var token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsaW5oLm5uMjgwMzk5QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJURU5BTlRfQURNSU4iXSwidXNlcklkIjoiYmJhYTFlNTAtZDY1My0xMWViLTkzODEtYWIyYTFhOGRhYWYwIiwiZmlyc3ROYW1lIjoiTmd1eWVuIiwibGFzdE5hbWUiOiJOaGF0IExpbmgiLCJlbmFibGVkIjp0cnVlLCJwcml2YWN5UG9saWN5QWNjZXB0ZWQiOnRydWUsImlzUHVibGljIjpmYWxzZSwidGVuYW50SWQiOiJiYTgyOGU0MC1kNjUzLTExZWItOTM4MS1hYjJhMWE4ZGFhZjAiLCJjdXN0b21lcklkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiaXNzIjoidGhpbmdzYm9hcmQuaW8iLCJpYXQiOjE2MjQ4ODI0OTEsImV4cCI6MTYyNjY4MjQ5MX0.U39ncfK0FsmJMfzxZ1pLWvHC9fFbtV9w-iOYlIC7S2HYL9lf1Wsq3YESs80cOI1hp6goZ1vmBcPj-bIxL45wrQ";
-    var entityId = "ab416f70-d8b3-11eb-b87d-c1a34fc0b07b";
+    var entityId = "e526c210-dd65-11eb-bb75-a1672e109977";
     var webSocket = new WebSocket("wss://demo.thingsboard.io/api/ws/plugins/telemetry?token=" + token);
     webSocket.onopen = function () {
         var object = {
@@ -58,7 +58,7 @@ function deviceGPSUAV() {
 
 const device1 = new Promise((resolve, reject)=>{
         var token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsaW5oLm5uMjgwMzk5QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJURU5BTlRfQURNSU4iXSwidXNlcklkIjoiYmJhYTFlNTAtZDY1My0xMWViLTkzODEtYWIyYTFhOGRhYWYwIiwiZmlyc3ROYW1lIjoiTmd1eWVuIiwibGFzdE5hbWUiOiJOaGF0IExpbmgiLCJlbmFibGVkIjp0cnVlLCJwcml2YWN5UG9saWN5QWNjZXB0ZWQiOnRydWUsImlzUHVibGljIjpmYWxzZSwidGVuYW50SWQiOiJiYTgyOGU0MC1kNjUzLTExZWItOTM4MS1hYjJhMWE4ZGFhZjAiLCJjdXN0b21lcklkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiaXNzIjoidGhpbmdzYm9hcmQuaW8iLCJpYXQiOjE2MjQ4ODI0OTEsImV4cCI6MTYyNjY4MjQ5MX0.U39ncfK0FsmJMfzxZ1pLWvHC9fFbtV9w-iOYlIC7S2HYL9lf1Wsq3YESs80cOI1hp6goZ1vmBcPj-bIxL45wrQ";
-        var entityId = '8fdf2190-d8b4-11eb-9381-ab2a1a8daaf0'
+        var entityId = '23f06860-dd67-11eb-bb75-a1672e109977'
         var webSocket = new WebSocket("wss://demo.thingsboard.io/api/ws/plugins/telemetry?token=" + token);
         webSocket.onopen = function () {
             var object = {
@@ -238,8 +238,10 @@ function showAndUpdateData(num) {
     
     if (num == 0){
         device1.then(res => {
-            $('#key').text(`Humidity`)
-            $('#value').text(`${res.HUM[0][1]} %`)
+            $('#key1').text(`Humidity: ${res.Dust1[0][1]}`)
+            $('#key2').text(`Humidity: ${res.Humidity1[0][1]}`)
+            $('#key3').text(`Humidity: ${res.Pressure1[0][1]}`)
+            $('#key4').text(`Humidity: ${res.Temperature1[0][1]}`)
         })
         .catch(err => {
             console.log(err)
@@ -247,8 +249,10 @@ function showAndUpdateData(num) {
     }
     if (num == 1){
         device3.then(res => {
-            $('#key').text(`Temperature`)
-            $('#value').text(`${res.TEMP4[0][1]} °C`)
+            $('#key1').text(`Humidity: ${res.Dust1[0][1]}`)
+            $('#key2').text(`Humidity: ${res.Humidity1[0][1]}`)
+            $('#key3').text(`Humidity: ${res.Pressure1[0][1]}`)
+            $('#key4').text(`Humidity: ${res.Temperature1[0][1]}`)
         })
         .catch(err => {
             console.log(err)
@@ -256,8 +260,10 @@ function showAndUpdateData(num) {
     }
     if (num == 2) {
         device5.then(res => {
-            $('#key').text(`Dust`)
-            $('#value').text(`${res.DUST1[0][1]} mg/m3`)
+            $('#key1').text(`Humidity: ${res.Dust1[0][1]}`)
+            $('#key2').text(`Humidity: ${res.Humidity1[0][1]}`)
+            $('#key3').text(`Humidity: ${res.Pressure1[0][1]}`)
+            $('#key4').text(`Humidity: ${res.Temperature1[0][1]}`)
         })
         .catch(err => {
             console.log(err)
