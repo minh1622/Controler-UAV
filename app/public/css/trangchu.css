@@ -132,12 +132,14 @@ html, body {
 }
 .drone-pos p{
     margin-bottom: 0px;
-    text-align: center;
 }
 .pos-1{
     background-color: #b4b4b4;
     text-align: center;
     color: #003f57;
+}
+.drone-pos p{
+    text-align: center;
 }
 .data-sensor {
     display: none;

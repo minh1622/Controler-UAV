@@ -5,6 +5,7 @@ var map;
 var mark;
 var lineCoords = [];
 var markers = [];
+var newnum;
 //data received frome thingsboard
 var receivedDataDevice2;
 var data;
@@ -17,44 +18,6 @@ const sensorGPS = [
     {lat: 21.0065144, lng: 105.8429997}
 ];
 
-//function auto update drone position
-function deviceGPSUAV() {
-    var token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsaW5oLm5uMjgwMzk5QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJURU5BTlRfQURNSU4iXSwidXNlcklkIjoiYmJhYTFlNTAtZDY1My0xMWViLTkzODEtYWIyYTFhOGRhYWYwIiwiZmlyc3ROYW1lIjoiTmd1eWVuIiwibGFzdE5hbWUiOiJOaGF0IExpbmgiLCJlbmFibGVkIjp0cnVlLCJwcml2YWN5UG9saWN5QWNjZXB0ZWQiOnRydWUsImlzUHVibGljIjpmYWxzZSwidGVuYW50SWQiOiJiYTgyOGU0MC1kNjUzLTExZWItOTM4MS1hYjJhMWE4ZGFhZjAiLCJjdXN0b21lcklkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiaXNzIjoidGhpbmdzYm9hcmQuaW8iLCJpYXQiOjE2MjQ4ODI0OTEsImV4cCI6MTYyNjY4MjQ5MX0.U39ncfK0FsmJMfzxZ1pLWvHC9fFbtV9w-iOYlIC7S2HYL9lf1Wsq3YESs80cOI1hp6goZ1vmBcPj-bIxL45wrQ";
-    var entityId = "e526c210-dd65-11eb-bb75-a1672e109977";
-    var webSocket = new WebSocket("wss://demo.thingsboard.io/api/ws/plugins/telemetry?token=" + token);
-    webSocket.onopen = function () {
-        var object = {
-            tsSubCmds: [
-                {
-                    entityType: "DEVICE",
-                    entityId: entityId,
-                    scope: "LATEST_TELEMETRY",
-                    cmdId: 10
-                }
-            ],
-            historyCmds: [],
-            attrSubCmds: []
-        };
-        var data = JSON.stringify(object);
-        webSocket.send(data);
-    };
-
-    webSocket.onmessage = function (event) {
-        var received_msg = event.data;
-        var receivedData = JSON.parse(received_msg)
-        lat = parseFloat(receivedData.data.Lat_UAV[0][1])
-        lng = parseFloat(receivedData.data.Lon_UAV[0][1])
-        var GPS = {
-            lat: lat,
-            lng: lng
-        }
-        redraw(GPS)
-        setGPS(GPS)
-    };
-    webSocket.onclose = function (event) {
-        console.log("Connection is closed!");
-    };
-}
 
 // New map
 var initialize = function() {
@@ -96,9 +59,8 @@ function newSensor(position, num) {
         showAndUpdateData(num)
         infowindow.open({
             anchor: sensors,
-            map,
+            map
         });
-        
     });
 }
 
@@ -135,193 +97,232 @@ linkColor.forEach(l => l.addEventListener("click", colorLink))
 // update data sensor
 function showAndUpdateData(num) {
     $('.data-sensor .pos-1').text(`Sensor number ${num}`)
-
-    const device2 = new Promise((resolve, reject)=>{
-        var token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsaW5oLm5uMjgwMzk5QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJURU5BTlRfQURNSU4iXSwidXNlcklkIjoiYmJhYTFlNTAtZDY1My0xMWViLTkzODEtYWIyYTFhOGRhYWYwIiwiZmlyc3ROYW1lIjoiTmd1eWVuIiwibGFzdE5hbWUiOiJOaGF0IExpbmgiLCJlbmFibGVkIjp0cnVlLCJwcml2YWN5UG9saWN5QWNjZXB0ZWQiOnRydWUsImlzUHVibGljIjpmYWxzZSwidGVuYW50SWQiOiJiYTgyOGU0MC1kNjUzLTExZWItOTM4MS1hYjJhMWE4ZGFhZjAiLCJjdXN0b21lcklkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiaXNzIjoidGhpbmdzYm9hcmQuaW8iLCJpYXQiOjE2MjQ4ODI0OTEsImV4cCI6MTYyNjY4MjQ5MX0.U39ncfK0FsmJMfzxZ1pLWvHC9fFbtV9w-iOYlIC7S2HYL9lf1Wsq3YESs80cOI1hp6goZ1vmBcPj-bIxL45wrQ";
-        var entityId = '23f06860-dd67-11eb-bb75-a1672e109977'
-        var webSocket = new WebSocket("wss://demo.thingsboard.io/api/ws/plugins/telemetry?token=" + token);
-        webSocket.onopen = function () {
-            var object = {
-                tsSubCmds: [
-                    {
-                        entityType: "DEVICE",
-                        entityId: entityId,
-                        scope: "LATEST_TELEMETRY",
-                        cmdId: 10
-                    }
-                ],
-                historyCmds: [],
-                attrSubCmds: []
-            };
-            var data = JSON.stringify(object);
-            webSocket.send(data);
-        };
-    
-        webSocket.onmessage = function (event) {
-            var received_msg = event.data;
-            receivedDataDevice2 = JSON.parse(received_msg)
-            receivedDataDevice2 = receivedDataDevice2.data
-            resolve(receivedDataDevice2)
-        };
-        webSocket.onclose = function (event) {
-            console.log("Connection is closed!");
-        };
-        
-    }
-    )
-    const device3 = new Promise((resolve, reject)=>{
-        var token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsaW5oLm5uMjgwMzk5QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJURU5BTlRfQURNSU4iXSwidXNlcklkIjoiYmJhYTFlNTAtZDY1My0xMWViLTkzODEtYWIyYTFhOGRhYWYwIiwiZmlyc3ROYW1lIjoiTmd1eWVuIiwibGFzdE5hbWUiOiJOaGF0IExpbmgiLCJlbmFibGVkIjp0cnVlLCJwcml2YWN5UG9saWN5QWNjZXB0ZWQiOnRydWUsImlzUHVibGljIjpmYWxzZSwidGVuYW50SWQiOiJiYTgyOGU0MC1kNjUzLTExZWItOTM4MS1hYjJhMWE4ZGFhZjAiLCJjdXN0b21lcklkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiaXNzIjoidGhpbmdzYm9hcmQuaW8iLCJpYXQiOjE2MjQ4ODI0OTEsImV4cCI6MTYyNjY4MjQ5MX0.U39ncfK0FsmJMfzxZ1pLWvHC9fFbtV9w-iOYlIC7S2HYL9lf1Wsq3YESs80cOI1hp6goZ1vmBcPj-bIxL45wrQ";
-        var entityId = '21905a70-de3a-11eb-bb75-a1672e109977'
-        var webSocket = new WebSocket("wss://demo.thingsboard.io/api/ws/plugins/telemetry?token=" + token);
-        webSocket.onopen = function () {
-            var object = {
-                tsSubCmds: [
-                    {
-                        entityType: "DEVICE",
-                        entityId: entityId,
-                        scope: "LATEST_TELEMETRY",
-                        cmdId: 10
-                    }
-                ],
-                historyCmds: [],
-                attrSubCmds: []
-            };
-            var data = JSON.stringify(object);
-            webSocket.send(data);
-        };
-
-        webSocket.onmessage = function (event) {
-            var received_msg = event.data;
-            receivedDataDevice2 = JSON.parse(received_msg)
-            receivedDataDevice2 = receivedDataDevice2.data
-            resolve(receivedDataDevice2)
-        };
-        webSocket.onclose = function (event) {
-            console.log("Connection is closed!");
-        };
-        
-    }
-    )
-    const device4 = new Promise((resolve, reject)=>{
-        var token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsaW5oLm5uMjgwMzk5QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJURU5BTlRfQURNSU4iXSwidXNlcklkIjoiYmJhYTFlNTAtZDY1My0xMWViLTkzODEtYWIyYTFhOGRhYWYwIiwiZmlyc3ROYW1lIjoiTmd1eWVuIiwibGFzdE5hbWUiOiJOaGF0IExpbmgiLCJlbmFibGVkIjp0cnVlLCJwcml2YWN5UG9saWN5QWNjZXB0ZWQiOnRydWUsImlzUHVibGljIjpmYWxzZSwidGVuYW50SWQiOiJiYTgyOGU0MC1kNjUzLTExZWItOTM4MS1hYjJhMWE4ZGFhZjAiLCJjdXN0b21lcklkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiaXNzIjoidGhpbmdzYm9hcmQuaW8iLCJpYXQiOjE2MjQ4ODI0OTEsImV4cCI6MTYyNjY4MjQ5MX0.U39ncfK0FsmJMfzxZ1pLWvHC9fFbtV9w-iOYlIC7S2HYL9lf1Wsq3YESs80cOI1hp6goZ1vmBcPj-bIxL45wrQ";
-        var entityId = '64f8f9c0-de3a-11eb-bb75-a1672e109977'
-        var webSocket = new WebSocket("wss://demo.thingsboard.io/api/ws/plugins/telemetry?token=" + token);
-        webSocket.onopen = function () {
-            var object = {
-                tsSubCmds: [
-                    {
-                        entityType: "DEVICE",
-                        entityId: entityId,
-                        scope: "LATEST_TELEMETRY",
-                        cmdId: 10
-                    }
-                ],
-                historyCmds: [],
-                attrSubCmds: []
-            };
-            var data = JSON.stringify(object);
-            webSocket.send(data);
-        };
-
-        webSocket.onmessage = function (event) {
-            var received_msg = event.data;
-            receivedDataDevice2 = JSON.parse(received_msg)
-            receivedDataDevice2 = receivedDataDevice2.data
-            resolve(receivedDataDevice2)
-        };
-        webSocket.onclose = function (event) {
-            console.log("Connection is closed!");
-        };
-        
-    }
-    )
-    const device5 = new Promise((resolve, reject)=>{
-        var token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsaW5oLm5uMjgwMzk5QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJURU5BTlRfQURNSU4iXSwidXNlcklkIjoiYmJhYTFlNTAtZDY1My0xMWViLTkzODEtYWIyYTFhOGRhYWYwIiwiZmlyc3ROYW1lIjoiTmd1eWVuIiwibGFzdE5hbWUiOiJOaGF0IExpbmgiLCJlbmFibGVkIjp0cnVlLCJwcml2YWN5UG9saWN5QWNjZXB0ZWQiOnRydWUsImlzUHVibGljIjpmYWxzZSwidGVuYW50SWQiOiJiYTgyOGU0MC1kNjUzLTExZWItOTM4MS1hYjJhMWE4ZGFhZjAiLCJjdXN0b21lcklkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiaXNzIjoidGhpbmdzYm9hcmQuaW8iLCJpYXQiOjE2MjQ4ODI0OTEsImV4cCI6MTYyNjY4MjQ5MX0.U39ncfK0FsmJMfzxZ1pLWvHC9fFbtV9w-iOYlIC7S2HYL9lf1Wsq3YESs80cOI1hp6goZ1vmBcPj-bIxL45wrQ";
-        var entityId = 'b5688f10-de3a-11eb-bb75-a1672e109977'
-        var webSocket = new WebSocket("wss://demo.thingsboard.io/api/ws/plugins/telemetry?token=" + token);
-        webSocket.onopen = function () {
-            var object = {
-                tsSubCmds: [
-                    {
-                        entityType: "DEVICE",
-                        entityId: entityId,
-                        scope: "LATEST_TELEMETRY",
-                        cmdId: 10
-                    }
-                ],
-                historyCmds: [],
-                attrSubCmds: []
-            };
-            var data = JSON.stringify(object);
-            webSocket.send(data);
-        };
-
-        webSocket.onmessage = function (event) {
-            var received_msg = event.data;
-            receivedDataDevice2 = JSON.parse(received_msg)
-            receivedDataDevice2 = receivedDataDevice2.data
-            resolve(receivedDataDevice2)
-        };
-        webSocket.onclose = function (event) {
-            console.log("Connection is closed!");
-        };
-        
-    }
-    )
-
+    var entityId
     if (num == 0){
-        device2.then(res => {
-            $('#key1').text(`Dust1: ${res.Dust1[0][1]}`)
-            $('#key2').text(`Humidity1: ${res.Humidity1[0][1]}`)
-            $('#key3').text(`Pressure1: ${res.Pressure1[0][1]}`)
-            $('#key4').text(`Temperature1: ${res.Temperature1[0][1]}`)
+        entityId = '23f06860-dd67-11eb-bb75-a1672e109977'
+        const device = new Promise((resolve, reject)=>{
+            var token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsaW5oLm5uMjgwMzk5QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJURU5BTlRfQURNSU4iXSwidXNlcklkIjoiYmJhYTFlNTAtZDY1My0xMWViLTkzODEtYWIyYTFhOGRhYWYwIiwiZmlyc3ROYW1lIjoiTmd1eWVuIiwibGFzdE5hbWUiOiJOaGF0IExpbmgiLCJlbmFibGVkIjp0cnVlLCJwcml2YWN5UG9saWN5QWNjZXB0ZWQiOnRydWUsImlzUHVibGljIjpmYWxzZSwidGVuYW50SWQiOiJiYTgyOGU0MC1kNjUzLTExZWItOTM4MS1hYjJhMWE4ZGFhZjAiLCJjdXN0b21lcklkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiaXNzIjoidGhpbmdzYm9hcmQuaW8iLCJpYXQiOjE2MjQ4ODI0OTEsImV4cCI6MTYyNjY4MjQ5MX0.U39ncfK0FsmJMfzxZ1pLWvHC9fFbtV9w-iOYlIC7S2HYL9lf1Wsq3YESs80cOI1hp6goZ1vmBcPj-bIxL45wrQ";
+            var webSocket = new WebSocket("wss://demo.thingsboard.io/api/ws/plugins/telemetry?token=" + token);
+            webSocket.onopen = function () {
+                var object = {
+                    tsSubCmds: [
+                        {
+                            entityType: "DEVICE",
+                            entityId: entityId,
+                            scope: "LATEST_TELEMETRY",
+                            cmdId: 10
+                        }
+                    ],
+                    historyCmds: [],
+                    attrSubCmds: []
+                };
+                var data = JSON.stringify(object);
+                webSocket.send(data);
+            };
+        
+            webSocket.onmessage = function (event) {
+                var received_msg = event.data;
+                receivedDataDevice2 = JSON.parse(received_msg)
+                receivedDataDevice2 = receivedDataDevice2.data
+                resolve(receivedDataDevice2)
+            };
+            webSocket.onclose = function (event) {
+                console.log("Connection is closed!");
+            };          
+        }
+        )
+        device.then(res => {
+            $('#key1').text(`Dust: ${res.Dust1[0][1]}`)
+            $('#key2').text(`Humidity: ${res.Humidity1[0][1]}`)
+            $('#key3').text(`Pressure: ${res.Pressure1[0][1]}`)
+            $('#key4').text(`Temperature: ${res.Temperature1[0][1]}`)
+            console.log("ok")
         })
         .catch(err => {
             console.log(err)
         })
     }
     if (num == 1){
-        device3.then(res => {
-            $('#key1').text(`Dust2: ${res.Dust2[0][1]}`)
-            $('#key2').text(`Humidity2: ${res.Humidity2[0][1]}`)
-            $('#key3').text(`Pressure2: ${res.Pressure2[0][1]}`)
-            $('#key4').text(`Temperature2: ${res.Temperature2[0][1]}`)
+        entityId = '21905a70-de3a-11eb-bb75-a1672e109977'
+        const device = new Promise((resolve, reject)=>{
+            var token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsaW5oLm5uMjgwMzk5QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJURU5BTlRfQURNSU4iXSwidXNlcklkIjoiYmJhYTFlNTAtZDY1My0xMWViLTkzODEtYWIyYTFhOGRhYWYwIiwiZmlyc3ROYW1lIjoiTmd1eWVuIiwibGFzdE5hbWUiOiJOaGF0IExpbmgiLCJlbmFibGVkIjp0cnVlLCJwcml2YWN5UG9saWN5QWNjZXB0ZWQiOnRydWUsImlzUHVibGljIjpmYWxzZSwidGVuYW50SWQiOiJiYTgyOGU0MC1kNjUzLTExZWItOTM4MS1hYjJhMWE4ZGFhZjAiLCJjdXN0b21lcklkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiaXNzIjoidGhpbmdzYm9hcmQuaW8iLCJpYXQiOjE2MjQ4ODI0OTEsImV4cCI6MTYyNjY4MjQ5MX0.U39ncfK0FsmJMfzxZ1pLWvHC9fFbtV9w-iOYlIC7S2HYL9lf1Wsq3YESs80cOI1hp6goZ1vmBcPj-bIxL45wrQ";
+            var webSocket = new WebSocket("wss://demo.thingsboard.io/api/ws/plugins/telemetry?token=" + token);
+            webSocket.onopen = function () {
+                var object = {
+                    tsSubCmds: [
+                        {
+                            entityType: "DEVICE",
+                            entityId: entityId,
+                            scope: "LATEST_TELEMETRY",
+                            cmdId: 10
+                        }
+                    ],
+                    historyCmds: [],
+                    attrSubCmds: []
+                };
+                var data = JSON.stringify(object);
+                webSocket.send(data);
+            };
+        
+            webSocket.onmessage = function (event) {
+                var received_msg = event.data;
+                receivedDataDevice2 = JSON.parse(received_msg)
+                receivedDataDevice2 = receivedDataDevice2.data
+                resolve(receivedDataDevice2)
+            };
+            webSocket.onclose = function (event) {
+                console.log("Connection is closed!");
+            };          
+        }
+        )
+        device.then(res => {
+            $('#key1').text(`Dust: ${res.Dust2[0][1]}`)
+            $('#key2').text(`Humidity: ${res.Humidity2[0][1]}`)
+            $('#key3').text(`Pressure: ${res.Pressure2[0][1]}`)
+            $('#key4').text(`Temperature: ${res.Temperature2[0][1]}`)
+            console.log("ok")
         })
         .catch(err => {
             console.log(err)
         })
     }
-    if (num == 2) {
-        device4.then(res => {
-            $('#key1').text(`Dust3: ${res.Dust3[0][1]}`)
-            $('#key2').text(`Humidity3: ${res.Humidity3[0][1]}`)
-            $('#key3').text(`Pressure3: ${res.Pressure3[0][1]}`)
-            $('#key4').text(`Temperature3: ${res.Temperature3[0][1]}`)
+    if (num == 2){
+        entityId = '64f8f9c0-de3a-11eb-bb75-a1672e109977'
+        const device = new Promise((resolve, reject)=>{
+            var token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsaW5oLm5uMjgwMzk5QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJURU5BTlRfQURNSU4iXSwidXNlcklkIjoiYmJhYTFlNTAtZDY1My0xMWViLTkzODEtYWIyYTFhOGRhYWYwIiwiZmlyc3ROYW1lIjoiTmd1eWVuIiwibGFzdE5hbWUiOiJOaGF0IExpbmgiLCJlbmFibGVkIjp0cnVlLCJwcml2YWN5UG9saWN5QWNjZXB0ZWQiOnRydWUsImlzUHVibGljIjpmYWxzZSwidGVuYW50SWQiOiJiYTgyOGU0MC1kNjUzLTExZWItOTM4MS1hYjJhMWE4ZGFhZjAiLCJjdXN0b21lcklkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiaXNzIjoidGhpbmdzYm9hcmQuaW8iLCJpYXQiOjE2MjQ4ODI0OTEsImV4cCI6MTYyNjY4MjQ5MX0.U39ncfK0FsmJMfzxZ1pLWvHC9fFbtV9w-iOYlIC7S2HYL9lf1Wsq3YESs80cOI1hp6goZ1vmBcPj-bIxL45wrQ";
+            var webSocket = new WebSocket("wss://demo.thingsboard.io/api/ws/plugins/telemetry?token=" + token);
+            webSocket.onopen = function () {
+                var object = {
+                    tsSubCmds: [
+                        {
+                            entityType: "DEVICE",
+                            entityId: entityId,
+                            scope: "LATEST_TELEMETRY",
+                            cmdId: 10
+                        }
+                    ],
+                    historyCmds: [],
+                    attrSubCmds: []
+                };
+                var data = JSON.stringify(object);
+                webSocket.send(data);
+            };
+        
+            webSocket.onmessage = function (event) {
+                var received_msg = event.data;
+                receivedDataDevice2 = JSON.parse(received_msg)
+                receivedDataDevice2 = receivedDataDevice2.data
+                resolve(receivedDataDevice2)
+            };
+            webSocket.onclose = function (event) {
+                console.log("Connection is closed!");
+            };          
+        }
+        )
+        device.then(res => {
+            $('#key1').text(`Dust: ${res.Dust3[0][1]}`)
+            $('#key2').text(`Humidity: ${res.Humidity3[0][1]}`)
+            $('#key3').text(`Pressure: ${res.Pressure3[0][1]}`)
+            $('#key4').text(`Temperature: ${res.Temperature3[0][1]}`)
+            console.log("ok")
         })
         .catch(err => {
             console.log(err)
         })
     }
-    if (num == 3) {
-        device5.then(res => {
-            $('#key1').text(`Dust4: ${res.Dust4[0][1]}`)
-            $('#key2').text(`Humidity4: ${res.Humidity4[0][1]}`)
-            $('#key3').text(`Pressure4: ${res.Pressure4[0][1]}`)
-            $('#key4').text(`Temperature4: ${res.Temperature4[0][1]}`)
+    if (num == 3){
+        entityId = 'b5688f10-de3a-11eb-bb75-a1672e109977'
+        const device = new Promise((resolve, reject)=>{
+            var token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsaW5oLm5uMjgwMzk5QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJURU5BTlRfQURNSU4iXSwidXNlcklkIjoiYmJhYTFlNTAtZDY1My0xMWViLTkzODEtYWIyYTFhOGRhYWYwIiwiZmlyc3ROYW1lIjoiTmd1eWVuIiwibGFzdE5hbWUiOiJOaGF0IExpbmgiLCJlbmFibGVkIjp0cnVlLCJwcml2YWN5UG9saWN5QWNjZXB0ZWQiOnRydWUsImlzUHVibGljIjpmYWxzZSwidGVuYW50SWQiOiJiYTgyOGU0MC1kNjUzLTExZWItOTM4MS1hYjJhMWE4ZGFhZjAiLCJjdXN0b21lcklkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiaXNzIjoidGhpbmdzYm9hcmQuaW8iLCJpYXQiOjE2MjQ4ODI0OTEsImV4cCI6MTYyNjY4MjQ5MX0.U39ncfK0FsmJMfzxZ1pLWvHC9fFbtV9w-iOYlIC7S2HYL9lf1Wsq3YESs80cOI1hp6goZ1vmBcPj-bIxL45wrQ";
+            var webSocket = new WebSocket("wss://demo.thingsboard.io/api/ws/plugins/telemetry?token=" + token);
+            webSocket.onopen = function () {
+                var object = {
+                    tsSubCmds: [
+                        {
+                            entityType: "DEVICE",
+                            entityId: entityId,
+                            scope: "LATEST_TELEMETRY",
+                            cmdId: 10
+                        }
+                    ],
+                    historyCmds: [],
+                    attrSubCmds: []
+                };
+                var data = JSON.stringify(object);
+                webSocket.send(data);
+            };
+        
+            webSocket.onmessage = function (event) {
+                var received_msg = event.data;
+                receivedDataDevice2 = JSON.parse(received_msg)
+                receivedDataDevice2 = receivedDataDevice2.data
+                resolve(receivedDataDevice2)
+            };
+            webSocket.onclose = function (event) {
+                console.log("Connection is closed!");
+            };          
+        }
+        )
+        device.then(res => {
+            $('#key1').text(`Dust: ${res.Dust4[0][1]}`)
+            $('#key2').text(`Humidity: ${res.Humidity4[0][1]}`)
+            $('#key3').text(`Pressure: ${res.Pressure4[0][1]}`)
+            $('#key4').text(`Temperature: ${res.Temperature4[0][1]}`)
+            console.log("ok")
         })
         .catch(err => {
             console.log(err)
         })
     }
-    if($('.data-sensor').is(':visible')){
-        $('.data-sensor').hide()
-    }
-    else {
-        $('.data-sensor').show()
-    }
+    $('.data-sensor').show()
 }
 
+function closeData(){
+    $('.data-sensor').hide()
+}
 // Update UAV position
 setInterval(()=>{
-    deviceGPSUAV();
-}, 500)
+   //function auto update drone position
+var deviceGPSUAV = new Promise((resolve, reject) => {
+    var token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJsaW5oLm5uMjgwMzk5QGdtYWlsLmNvbSIsInNjb3BlcyI6WyJURU5BTlRfQURNSU4iXSwidXNlcklkIjoiYmJhYTFlNTAtZDY1My0xMWViLTkzODEtYWIyYTFhOGRhYWYwIiwiZmlyc3ROYW1lIjoiTmd1eWVuIiwibGFzdE5hbWUiOiJOaGF0IExpbmgiLCJlbmFibGVkIjp0cnVlLCJwcml2YWN5UG9saWN5QWNjZXB0ZWQiOnRydWUsImlzUHVibGljIjpmYWxzZSwidGVuYW50SWQiOiJiYTgyOGU0MC1kNjUzLTExZWItOTM4MS1hYjJhMWE4ZGFhZjAiLCJjdXN0b21lcklkIjoiMTM4MTQwMDAtMWRkMi0xMWIyLTgwODAtODA4MDgwODA4MDgwIiwiaXNzIjoidGhpbmdzYm9hcmQuaW8iLCJpYXQiOjE2MjQ4ODI0OTEsImV4cCI6MTYyNjY4MjQ5MX0.U39ncfK0FsmJMfzxZ1pLWvHC9fFbtV9w-iOYlIC7S2HYL9lf1Wsq3YESs80cOI1hp6goZ1vmBcPj-bIxL45wrQ";
+    var entityId = "e526c210-dd65-11eb-bb75-a1672e109977";
+    var webSocket = new WebSocket("wss://demo.thingsboard.io/api/ws/plugins/telemetry?token=" + token);
+    webSocket.onopen = function () {
+        var object = {
+            tsSubCmds: [
+                {
+                    entityType: "DEVICE",
+                    entityId: entityId,
+                    scope: "LATEST_TELEMETRY",
+                    cmdId: 10
+                }
+            ],
+            historyCmds: [],
+            attrSubCmds: []
+        };
+        var data = JSON.stringify(object);
+        webSocket.send(data);
+    };
+
+    webSocket.onmessage = function (event) {
+        var received_msg = event.data;
+        var receivedData = JSON.parse(received_msg)
+        lat = parseFloat(receivedData.data.Lat_UAV[0][1])
+        lng = parseFloat(receivedData.data.Lon_UAV[0][1])
+        var GPS = {
+            lat: lat,
+            lng: lng
+        }
+        resolve(GPS)
+    };
+    webSocket.onclose = function (event) {
+        console.log("Connection is closed!");
+    };
+})
+deviceGPSUAV.then(res=>{
+    redraw(res)
+    setGPS(res)
+}).catch(err=>{
+    console.log(err)
+})
+}, 1000)
