@@ -1,3 +1,4 @@
+const cons = require('consolidate')
 var mqtt = require('mqtt')
 
 exports.pubdata = (req, res) => {

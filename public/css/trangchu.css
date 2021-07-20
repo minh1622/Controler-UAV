@@ -130,6 +130,13 @@ html, body {
     flex-direction: column;
     color: white;
 }
+.publish-data {
+    position: absolute;
+    margin: 300px 180px 0 450px;
+    height: auto;
+    width: 400px;
+    display: none;
+}
 .drone-pos p{
     margin-bottom: 0px;
     text-align: center;
